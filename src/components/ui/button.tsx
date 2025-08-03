@@ -18,12 +18,17 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        // Fashion e-commerce variants
+        cart: "bg-accent text-accent-foreground hover:bg-accent/90 font-semibold",
+        shop: "bg-primary text-primary-foreground hover:bg-fashion-charcoal border-2 border-transparent hover:border-fashion-gold transition-all duration-300",
+        wishlist: "border border-border bg-transparent hover:bg-secondary text-foreground hover:text-accent",
       },
       size: {
         default: "h-10 px-4 py-2",
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-8",
         icon: "h-10 w-10",
+        cart: "h-12 px-6 py-3",
       },
     },
     defaultVariants: {

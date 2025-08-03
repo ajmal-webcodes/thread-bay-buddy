@@ -52,6 +52,13 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				// Fashion-specific colors
+				fashion: {
+					gold: 'hsl(var(--fashion-gold))',
+					rose: 'hsl(var(--fashion-rose))',
+					charcoal: 'hsl(var(--fashion-charcoal))',
+					cream: 'hsl(var(--fashion-cream))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
