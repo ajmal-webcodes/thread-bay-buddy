@@ -2,6 +2,9 @@ import { Product } from "@/types/store";
 import womensCollection from "@/assets/womens-collection.jpg";
 import mensCollection from "@/assets/mens-collection.jpg";
 import accessoriesCollection from "@/assets/accessories-collection.jpg";
+import cosmeticsCollection from "@/assets/cosmetics-collection.jpg";
+import skincareProducts from "@/assets/skincare-products.jpg";
+import makeupCollection from "@/assets/makeup-collection.jpg";
 
 export const products: Product[] = [
   {
@@ -102,5 +105,109 @@ export const products: Product[] = [
     colors: ["Black", "Brown", "Oxblood"],
     isOnSale: false,
     stock: 14
+  }
+];
+
+// Cosmetic Products
+export const cosmeticProducts: Product[] = [
+  {
+    id: "c1",
+    name: "Luxury Foundation Set",
+    price: 89.99,
+    originalPrice: 119.99,
+    category: "Makeup",
+    image: makeupCollection,
+    description: "Full coverage foundation with matching concealer and setting powder. Perfect for all-day wear with a natural, radiant finish.",
+    sizes: ["30ml", "50ml"],
+    colors: ["Porcelain", "Ivory", "Beige", "Tan", "Deep"],
+    isOnSale: true,
+    stock: 25
+  },
+  {
+    id: "c2",
+    name: "Anti-Aging Serum Complex",
+    price: 149.99,
+    category: "Skincare",
+    image: skincareProducts,
+    description: "Advanced peptide serum with vitamin C and hyaluronic acid. Reduces fine lines and brightens skin for a youthful glow.",
+    sizes: ["30ml", "50ml"],
+    colors: ["Clear"],
+    isOnSale: false,
+    stock: 18
+  },
+  {
+    id: "c3",
+    name: "Signature Fragrance Collection",
+    price: 199.99,
+    originalPrice: 249.99,
+    category: "Fragrance",
+    image: cosmeticsCollection,
+    description: "Exclusive perfume duo featuring our bestselling day and evening fragrances. Elegant floral and woody notes.",
+    sizes: ["50ml", "100ml"],
+    colors: ["Day Scent", "Evening Scent"],
+    isOnSale: true,
+    stock: 12
+  },
+  {
+    id: "c4",
+    name: "Professional Makeup Brush Set",
+    price: 79.99,
+    category: "Makeup",
+    image: makeupCollection,
+    description: "12-piece professional makeup brush set with vegan bristles and ergonomic handles. Perfect for all makeup applications.",
+    sizes: ["Full Set"],
+    colors: ["Rose Gold", "Silver", "Black"],
+    isOnSale: false,
+    stock: 30
+  },
+  {
+    id: "c5",
+    name: "Hydrating Face Mask Collection",
+    price: 59.99,
+    originalPrice: 79.99,
+    category: "Skincare",
+    image: skincareProducts,
+    description: "Set of 6 premium sheet masks with different formulas: hydrating, brightening, purifying, and anti-aging.",
+    sizes: ["6-Pack", "12-Pack"],
+    colors: ["Multi"],
+    isOnSale: true,
+    stock: 40
+  },
+  {
+    id: "c6",
+    name: "Matte Liquid Lipstick Trio",
+    price: 45.99,
+    category: "Makeup",
+    image: makeupCollection,
+    description: "Long-lasting matte liquid lipsticks in three versatile shades. Comfortable formula that doesn't dry out lips.",
+    sizes: ["3ml each"],
+    colors: ["Nude", "Red", "Pink", "Berry", "Brown"],
+    isOnSale: false,
+    stock: 35
+  },
+  {
+    id: "c7",
+    name: "Vitamin C Brightening Cream",
+    price: 89.99,
+    category: "Skincare",
+    image: skincareProducts,
+    description: "Daily moisturizer with vitamin C, niacinamide, and SPF 30. Brightens skin tone while providing all-day hydration.",
+    sizes: ["50ml", "100ml"],
+    colors: ["White"],
+    isOnSale: false,
+    stock: 22
+  },
+  {
+    id: "c8",
+    name: "Eyeshadow Palette - Sunset Collection",
+    price: 69.99,
+    originalPrice: 89.99,
+    category: "Makeup",
+    image: makeupCollection,
+    description: "18-shade eyeshadow palette with warm sunset tones. Mix of matte and shimmer finishes for endless eye looks.",
+    sizes: ["Standard"],
+    colors: ["Warm Tones", "Cool Tones", "Neutral"],
+    isOnSale: true,
+    stock: 28
   }
 ];

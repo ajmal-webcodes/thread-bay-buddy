@@ -41,6 +41,9 @@ const Header = ({ cartItemsCount, onCartClick, onProfileClick }: HeaderProps) =>
               Accessories
             </a>
             <a href="#" className="text-sm font-medium hover:text-accent transition-colors">
+              Beauty
+            </a>
+            <a href="#" className="text-sm font-medium hover:text-accent transition-colors">
               Sale
             </a>
           </nav>
@@ -82,6 +85,9 @@ const Header = ({ cartItemsCount, onCartClick, onProfileClick }: HeaderProps) =>
               </a>
               <a href="#" className="text-sm font-medium hover:text-accent transition-colors">
                 Accessories
+              </a>
+              <a href="#" className="text-sm font-medium hover:text-accent transition-colors">
+                Beauty
               </a>
               <a href="#" className="text-sm font-medium hover:text-accent transition-colors">
                 Sale

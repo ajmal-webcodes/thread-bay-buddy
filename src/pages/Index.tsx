@@ -7,7 +7,8 @@ import Cart from "@/components/store/Cart";
 import ProductModal from "@/components/store/ProductModal";
 import ProfileModal from "@/components/store/ProfileModal";
 import Footer from "@/components/store/Footer";
-import { products } from "@/data/products";
+import CosmeticsSection from "@/components/store/CosmeticsSection";
+import { products, cosmeticProducts } from "@/data/products";
 import { Product, CartItem } from "@/types/store";
 
 const Index = () => {
@@ -98,6 +99,11 @@ const Index = () => {
         <Hero />
         <ProductGrid 
           products={products}
+          onAddToCart={(product) => addToCart(product)}
+          onProductClick={handleProductClick}
+        />
+        <CosmeticsSection
+          cosmeticProducts={cosmeticProducts}
           onAddToCart={(product) => addToCart(product)}
           onProductClick={handleProductClick}
         />
