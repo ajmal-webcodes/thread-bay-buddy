@@ -6,9 +6,10 @@ import { Badge } from "@/components/ui/badge";
 interface HeaderProps {
   cartItemsCount: number;
   onCartClick: () => void;
+  onProfileClick: () => void;
 }
 
-const Header = ({ cartItemsCount, onCartClick }: HeaderProps) => {
+const Header = ({ cartItemsCount, onCartClick, onProfileClick }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -49,7 +50,7 @@ const Header = ({ cartItemsCount, onCartClick }: HeaderProps) => {
             <Button variant="ghost" size="icon">
               <Search className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" onClick={onProfileClick}>
               <User className="h-5 w-5" />
             </Button>
             <Button variant="ghost" size="icon">

@@ -5,6 +5,8 @@ import Hero from "@/components/store/Hero";
 import ProductGrid from "@/components/store/ProductGrid";
 import Cart from "@/components/store/Cart";
 import ProductModal from "@/components/store/ProductModal";
+import ProfileModal from "@/components/store/ProfileModal";
+import Footer from "@/components/store/Footer";
 import { products } from "@/data/products";
 import { Product, CartItem } from "@/types/store";
 
@@ -13,6 +15,7 @@ const Index = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const { toast } = useToast();
 
   const addToCart = (product: Product, size?: string, color?: string) => {
@@ -87,7 +90,8 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header 
         cartItemsCount={cartItemsCount} 
-        onCartClick={() => setIsCartOpen(true)} 
+        onCartClick={() => setIsCartOpen(true)}
+        onProfileClick={() => setIsProfileModalOpen(true)}
       />
       
       <main>
@@ -97,6 +101,7 @@ const Index = () => {
           onAddToCart={(product) => addToCart(product)}
           onProductClick={handleProductClick}
         />
+        <Footer />
       </main>
 
       <Cart
@@ -113,6 +118,11 @@ const Index = () => {
         isOpen={isProductModalOpen}
         onClose={() => setIsProductModalOpen(false)}
         onAddToCart={handleModalAddToCart}
+      />
+
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
       />
     </div>
   );
