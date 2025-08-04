@@ -26,25 +26,25 @@ const Header = ({ cartItemsCount, onCartClick, onProfileClick }: HeaderProps) =>
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <h1 className="text-2xl font-bold tracking-tight">LUXE</h1>
+            <h1 className="text-2xl font-bold tracking-tight">VELVERRA</h1>
           </div>
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#" className="text-sm font-medium hover:text-accent transition-colors">
+            <a href="/women" className="text-sm font-medium hover:text-accent transition-colors">
               Women
             </a>
-            <a href="#" className="text-sm font-medium hover:text-accent transition-colors">
+            <a href="/men" className="text-sm font-medium hover:text-accent transition-colors">
               Men
             </a>
-            <a href="#" className="text-sm font-medium hover:text-accent transition-colors">
+            <a href="/accessories" className="text-sm font-medium hover:text-accent transition-colors">
               Accessories
             </a>
-            <a href="#" className="text-sm font-medium hover:text-accent transition-colors">
+            <a href="/beauty" className="text-sm font-medium hover:text-accent transition-colors">
               Beauty
             </a>
-            <a href="#" className="text-sm font-medium hover:text-accent transition-colors">
-              Sale
+            <a href="/wishlist" className="text-sm font-medium hover:text-accent transition-colors">
+              Wishlist
             </a>
           </nav>
 
@@ -77,20 +77,20 @@ const Header = ({ cartItemsCount, onCartClick, onProfileClick }: HeaderProps) =>
         {isMenuOpen && (
           <div className="md:hidden pb-4 border-t border-border mt-4 pt-4">
             <nav className="flex flex-col space-y-3">
-              <a href="#" className="text-sm font-medium hover:text-accent transition-colors">
+              <a href="/women" className="text-sm font-medium hover:text-accent transition-colors">
                 Women
               </a>
-              <a href="#" className="text-sm font-medium hover:text-accent transition-colors">
+              <a href="/men" className="text-sm font-medium hover:text-accent transition-colors">
                 Men
               </a>
-              <a href="#" className="text-sm font-medium hover:text-accent transition-colors">
+              <a href="/accessories" className="text-sm font-medium hover:text-accent transition-colors">
                 Accessories
               </a>
-              <a href="#" className="text-sm font-medium hover:text-accent transition-colors">
+              <a href="/beauty" className="text-sm font-medium hover:text-accent transition-colors">
                 Beauty
               </a>
-              <a href="#" className="text-sm font-medium hover:text-accent transition-colors">
-                Sale
+              <a href="/wishlist" className="text-sm font-medium hover:text-accent transition-colors">
+                Wishlist
               </a>
             </nav>
           </div>

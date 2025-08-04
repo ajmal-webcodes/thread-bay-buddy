@@ -7,11 +7,12 @@ import { Product } from "@/types/store";
 interface CosmeticCardProps {
   product: Product;
   onAddToCart: (product: Product) => void;
-  onProductClick: (product: Product) => void;
+  onProductClick?: (product: Product) => void;
+  onToggleWishlist?: (productId: string) => void;
+  isInWishlist?: boolean;
 }
 
-const CosmeticCard = ({ product, onAddToCart, onProductClick }: CosmeticCardProps) => {
-  const [isWishlisted, setIsWishlisted] = useState(false);
+const CosmeticCard = ({ product, onAddToCart, onProductClick, onToggleWishlist, isInWishlist = false }: CosmeticCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   // Generate random rating for cosmetic products
@@ -19,7 +20,7 @@ const CosmeticCard = ({ product, onAddToCart, onProductClick }: CosmeticCardProp
   const reviewCount = Math.floor(Math.random() * 500 + 50);
 
   return (
-    <div className="group cursor-pointer" onClick={() => onProductClick(product)}>
+    <div className="group cursor-pointer" onClick={() => onProductClick?.(product)}>
       <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-fashion-cream to-white p-4">
         {/* Product Image */}
         <div className="aspect-square relative">
@@ -57,11 +58,11 @@ const CosmeticCard = ({ product, onAddToCart, onProductClick }: CosmeticCardProp
             className="absolute bottom-3 right-3 bg-white/90 hover:bg-white transition-all duration-300 opacity-0 group-hover:opacity-100"
             onClick={(e) => {
               e.stopPropagation();
-              setIsWishlisted(!isWishlisted);
+              onToggleWishlist?.(product.id);
             }}
           >
             <Heart 
-              className={`h-4 w-4 ${isWishlisted ? 'fill-accent text-accent' : 'text-foreground'}`} 
+              className={`h-4 w-4 ${isInWishlist ? 'fill-accent text-accent' : 'text-foreground'}`} 
             />
           </Button>
           

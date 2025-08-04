@@ -7,15 +7,16 @@ import { Product } from "@/types/store";
 interface ProductCardProps {
   product: Product;
   onAddToCart: (product: Product) => void;
-  onProductClick: (product: Product) => void;
+  onProductClick?: (product: Product) => void;
+  onToggleWishlist?: (productId: string) => void;
+  isInWishlist?: boolean;
 }
 
-const ProductCard = ({ product, onAddToCart, onProductClick }: ProductCardProps) => {
-  const [isWishlisted, setIsWishlisted] = useState(false);
+const ProductCard = ({ product, onAddToCart, onProductClick, onToggleWishlist, isInWishlist = false }: ProductCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
-    <div className="group cursor-pointer" onClick={() => onProductClick(product)}>
+    <div className="group cursor-pointer" onClick={() => onProductClick?.(product)}>
       <div className="relative overflow-hidden rounded-lg bg-muted">
         {/* Product Image */}
         <div className="aspect-square relative">
@@ -45,11 +46,11 @@ const ProductCard = ({ product, onAddToCart, onProductClick }: ProductCardProps)
             className="absolute top-3 right-3 bg-white/80 hover:bg-white transition-all duration-300 opacity-0 group-hover:opacity-100"
             onClick={(e) => {
               e.stopPropagation();
-              setIsWishlisted(!isWishlisted);
+              onToggleWishlist?.(product.id);
             }}
           >
             <Heart 
-              className={`h-4 w-4 ${isWishlisted ? 'fill-accent text-accent' : 'text-foreground'}`} 
+              className={`h-4 w-4 ${isInWishlist ? 'fill-accent text-accent' : 'text-foreground'}`} 
             />
           </Button>
           
