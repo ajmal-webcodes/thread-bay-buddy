@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,6 +7,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { X, Camera, User, MapPin, Phone, Mail, Calendar } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -14,15 +17,21 @@ interface ProfileModalProps {
 }
 
 const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
+  const { user } = useAuth();
   const [profileData, setProfileData] = useState({
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    phone: "+1 (555) 123-4567",
-    address: "123 Fashion Street, New York, NY 10001",
-    bio: "Fashion enthusiast with a passion for timeless style and quality craftsmanship.",
-    joinDate: "2023-01-15"
+    display_name: "",
+    email: "",
+    avatar_url: "",
+    pincode: "",
+    home_phone: "",
+    work_phone: "",
+    address_line1: "",
+    address_line2: "",
+    city: "",
+    state: "",
+    country: "India"
   });
+  const [loading, setLoading] = useState(false);
 
   const [orderHistory] = useState([
     {
@@ -48,8 +57,82 @@ const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
     }
   ]);
 
+  // Load profile data when modal opens
+  useEffect(() => {
+    if (isOpen && user) {
+      loadProfile();
+    }
+  }, [isOpen, user]);
+
+  const loadProfile = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error loading profile:', error);
+        return;
+      }
+
+      if (data) {
+        setProfileData({
+          display_name: data.display_name || "",
+          email: data.email || user.email || "",
+          avatar_url: data.avatar_url || "",
+          pincode: data.pincode || "",
+          home_phone: data.home_phone || "",
+          work_phone: data.work_phone || "",
+          address_line1: data.address_line1 || "",
+          address_line2: data.address_line2 || "",
+          city: data.city || "",
+          state: data.state || "",
+          country: data.country || "India"
+        });
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleInputChange = (field: string, value: string) => {
     setProfileData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          ...profileData,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) {
+        console.error('Error saving profile:', error);
+        toast.error('Failed to save profile');
+        return;
+      }
+
+      toast.success('Profile saved successfully');
+      onClose();
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      toast.error('Failed to save profile');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -90,9 +173,9 @@ const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
                 <div className="flex items-center space-x-4">
                   <div className="relative">
                     <Avatar className="h-20 w-20">
-                      <AvatarImage src="/placeholder-avatar.jpg" />
+                      <AvatarImage src={profileData.avatar_url || "/placeholder-avatar.jpg"} />
                       <AvatarFallback className="text-xl">
-                        {profileData.firstName[0]}{profileData.lastName[0]}
+                        {profileData.display_name ? profileData.display_name.split(' ').map(n => n[0]).join('').toUpperCase() : 'U'}
                       </AvatarFallback>
                     </Avatar>
                     <Button
@@ -105,11 +188,11 @@ const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold">
-                      {profileData.firstName} {profileData.lastName}
+                      {profileData.display_name || 'Your Name'}
                     </h3>
                     <p className="text-muted-foreground flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
-                      Member since {new Date(profileData.joinDate).toLocaleDateString()}
+                      Member since {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'Recently'}
                     </p>
                   </div>
                 </div>
@@ -120,20 +203,13 @@ const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
                 <div className="space-y-4">
                   <h4 className="text-lg font-semibold">Personal Information</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="firstName">First Name</Label>
+                    <div className="md:col-span-2">
+                      <Label htmlFor="display_name">Display Name</Label>
                       <Input
-                        id="firstName"
-                        value={profileData.firstName}
-                        onChange={(e) => handleInputChange("firstName", e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="lastName">Last Name</Label>
-                      <Input
-                        id="lastName"
-                        value={profileData.lastName}
-                        onChange={(e) => handleInputChange("lastName", e.target.value)}
+                        id="display_name"
+                        value={profileData.display_name}
+                        onChange={(e) => handleInputChange("display_name", e.target.value)}
+                        placeholder="Your full name"
                       />
                     </div>
                     <div className="md:col-span-2">
@@ -146,49 +222,114 @@ const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
                         type="email"
                         value={profileData.email}
                         onChange={(e) => handleInputChange("email", e.target.value)}
+                        disabled
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Contact Information */}
+                <div className="space-y-4">
+                  <h4 className="text-lg font-semibold flex items-center gap-2">
+                    <Phone className="h-5 w-5" />
+                    Contact Information
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="home_phone">Home Phone</Label>
+                      <Input
+                        id="home_phone"
+                        value={profileData.home_phone}
+                        onChange={(e) => handleInputChange("home_phone", e.target.value)}
+                        placeholder="+91 XXXXX XXXXX"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="phone" className="flex items-center gap-1">
-                        <Phone className="h-4 w-4" />
-                        Phone
-                      </Label>
+                      <Label htmlFor="work_phone">Work Phone</Label>
                       <Input
-                        id="phone"
-                        value={profileData.phone}
-                        onChange={(e) => handleInputChange("phone", e.target.value)}
+                        id="work_phone"
+                        value={profileData.work_phone}
+                        onChange={(e) => handleInputChange("work_phone", e.target.value)}
+                        placeholder="+91 XXXXX XXXXX"
                       />
                     </div>
-                    <div>
-                      <Label htmlFor="address" className="flex items-center gap-1">
-                        <MapPin className="h-4 w-4" />
-                        Address
-                      </Label>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Address Information */}
+                <div className="space-y-4">
+                  <h4 className="text-lg font-semibold flex items-center gap-2">
+                    <MapPin className="h-5 w-5" />
+                    Address Information
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="md:col-span-2">
+                      <Label htmlFor="address_line1">Address Line 1</Label>
                       <Input
-                        id="address"
-                        value={profileData.address}
-                        onChange={(e) => handleInputChange("address", e.target.value)}
+                        id="address_line1"
+                        value={profileData.address_line1}
+                        onChange={(e) => handleInputChange("address_line1", e.target.value)}
+                        placeholder="House/Flat No, Building Name"
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <Label htmlFor="bio">Bio</Label>
-                      <Textarea
-                        id="bio"
-                        placeholder="Tell us about yourself..."
-                        value={profileData.bio}
-                        onChange={(e) => handleInputChange("bio", e.target.value)}
-                        rows={3}
+                      <Label htmlFor="address_line2">Address Line 2</Label>
+                      <Input
+                        id="address_line2"
+                        value={profileData.address_line2}
+                        onChange={(e) => handleInputChange("address_line2", e.target.value)}
+                        placeholder="Street, Area, Landmark (Optional)"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="city">City</Label>
+                      <Input
+                        id="city"
+                        value={profileData.city}
+                        onChange={(e) => handleInputChange("city", e.target.value)}
+                        placeholder="City"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="state">State</Label>
+                      <Input
+                        id="state"
+                        value={profileData.state}
+                        onChange={(e) => handleInputChange("state", e.target.value)}
+                        placeholder="State"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="pincode">Pincode</Label>
+                      <Input
+                        id="pincode"
+                        value={profileData.pincode}
+                        onChange={(e) => handleInputChange("pincode", e.target.value)}
+                        placeholder="6-digit pincode"
+                        maxLength={6}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="country">Country</Label>
+                      <Input
+                        id="country"
+                        value={profileData.country}
+                        onChange={(e) => handleInputChange("country", e.target.value)}
                       />
                     </div>
                   </div>
                 </div>
 
                 <div className="flex justify-end space-x-3">
-                  <Button variant="outline" onClick={onClose}>
+                  <Button variant="outline" onClick={onClose} disabled={loading}>
                     Cancel
                   </Button>
-                  <Button variant="cart">
-                    Save Changes
+                  <Button variant="cart" onClick={handleSaveProfile} disabled={loading}>
+                    {loading ? 'Saving...' : 'Save Changes'}
                   </Button>
                 </div>
               </TabsContent>

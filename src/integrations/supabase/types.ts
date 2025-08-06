@@ -16,28 +16,52 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          address_line1: string | null
+          address_line2: string | null
           avatar_url: string | null
+          city: string | null
+          country: string | null
           created_at: string | null
           display_name: string | null
           email: string | null
+          home_phone: string | null
           id: string
+          pincode: string | null
+          state: string | null
           updated_at: string | null
+          work_phone: string | null
         }
         Insert: {
+          address_line1?: string | null
+          address_line2?: string | null
           avatar_url?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string | null
           display_name?: string | null
           email?: string | null
+          home_phone?: string | null
           id: string
+          pincode?: string | null
+          state?: string | null
           updated_at?: string | null
+          work_phone?: string | null
         }
         Update: {
+          address_line1?: string | null
+          address_line2?: string | null
           avatar_url?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string | null
           display_name?: string | null
           email?: string | null
+          home_phone?: string | null
           id?: string
+          pincode?: string | null
+          state?: string | null
           updated_at?: string | null
+          work_phone?: string | null
         }
         Relationships: []
       }

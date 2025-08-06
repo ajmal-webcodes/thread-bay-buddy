@@ -1,8 +1,11 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { X, Plus, Minus, ShoppingBag } from "lucide-react";
+import { X, Plus, Minus, ShoppingBag, MapPin, Edit } from "lucide-react";
 import { CartItem } from "@/types/store";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 interface CartProps {
   isOpen: boolean;
@@ -14,6 +17,52 @@ interface CartProps {
 }
 
 const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, total }: CartProps) => {
+  const { user } = useAuth();
+  const [userAddress, setUserAddress] = useState<string>("");
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+
+  // Load user address when cart opens
+  useEffect(() => {
+    if (isOpen && user) {
+      loadUserAddress();
+    }
+  }, [isOpen, user]);
+
+  const loadUserAddress = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('address_line1, address_line2, city, state, pincode, country')
+        .eq('id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error loading address:', error);
+        return;
+      }
+
+      if (data) {
+        const addressParts = [
+          data.address_line1,
+          data.address_line2,
+          data.city,
+          data.state,
+          data.pincode,
+          data.country
+        ].filter(Boolean);
+        
+        setUserAddress(addressParts.join(', ') || "No address saved");
+      } else {
+        setUserAddress("No address saved");
+      }
+    } catch (error) {
+      console.error('Error loading address:', error);
+      setUserAddress("No address saved");
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -113,16 +162,87 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, total }:
           {/* Footer */}
           {items.length > 0 && (
             <div className="border-t border-border p-6 space-y-4">
+              {/* Delivery Address Section */}
+              {user && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <MapPin className="h-4 w-4" />
+                      Delivery Address
+                    </h4>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => setIsEditingAddress(true)}
+                      className="flex items-center gap-1"
+                    >
+                      <Edit className="h-3 w-3" />
+                      {userAddress === "No address saved" ? "Add" : "Change"}
+                    </Button>
+                  </div>
+                  <div className="p-3 bg-muted rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                      {userAddress}
+                    </p>
+                  </div>
+                  {userAddress === "No address saved" && (
+                    <p className="text-xs text-destructive">
+                      Please add your address in profile to proceed with checkout
+                    </p>
+                  )}
+                </div>
+              )}
+              
+              <Separator />
+              
               <div className="flex items-center justify-between text-lg font-semibold">
                 <span>Total</span>
                 <span>${total.toFixed(2)}</span>
               </div>
-              <Button variant="cart" size="cart" className="w-full">
-                Proceed to Checkout
+              <Button 
+                variant="cart" 
+                size="cart" 
+                className="w-full"
+                disabled={!user || userAddress === "No address saved"}
+              >
+                {!user ? "Login to Checkout" : userAddress === "No address saved" ? "Add Address to Checkout" : "Proceed to Checkout"}
               </Button>
               <Button variant="outline" className="w-full" onClick={onClose}>
                 Continue Shopping
               </Button>
+            </div>
+          )}
+
+          {/* Address Edit Modal Trigger */}
+          {isEditingAddress && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+              <div className="bg-background rounded-lg p-6 max-w-md w-full mx-4">
+                <h3 className="text-lg font-semibold mb-4">Update Address</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  To update your delivery address, please go to your profile settings.
+                </p>
+                <div className="flex gap-3">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setIsEditingAddress(false)}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    variant="cart"
+                    onClick={() => {
+                      setIsEditingAddress(false);
+                      // This would open the profile modal in a real implementation
+                      // For now, we'll just refresh the address
+                      loadUserAddress();
+                    }}
+                    className="flex-1"
+                  >
+                    Go to Profile
+                  </Button>
+                </div>
+              </div>
             </div>
           )}
         </div>
