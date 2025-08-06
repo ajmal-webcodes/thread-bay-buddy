@@ -6,6 +6,8 @@ import { X, Plus, Minus, ShoppingBag, MapPin, Edit } from "lucide-react";
 import { CartItem } from "@/types/store";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import AddressForm from "./AddressForm";
+import { useToast } from "@/hooks/use-toast";
 
 interface CartProps {
   isOpen: boolean;
@@ -18,8 +20,11 @@ interface CartProps {
 
 const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, total }: CartProps) => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [userAddress, setUserAddress] = useState<string>("");
   const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [addressType, setAddressType] = useState<"profile" | "delivery">("profile");
+  const [currentAddress, setCurrentAddress] = useState<any>(null);
 
   // Load user address when cart opens
   useEffect(() => {
@@ -44,6 +49,7 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, total }:
       }
 
       if (data) {
+        setCurrentAddress(data);
         const addressParts = [
           data.address_line1,
           data.address_line2,
@@ -55,11 +61,64 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, total }:
         
         setUserAddress(addressParts.join(', ') || "No address saved");
       } else {
+        setCurrentAddress(null);
         setUserAddress("No address saved");
       }
     } catch (error) {
       console.error('Error loading address:', error);
       setUserAddress("No address saved");
+    }
+  };
+
+  const handleAddressChange = (type: "profile" | "delivery") => {
+    setAddressType(type);
+    setIsEditingAddress(true);
+  };
+
+  const handleAddressSave = async (addressData: any) => {
+    try {
+      if (addressType === "profile") {
+        const { error } = await supabase
+          .from('profiles')
+          .update(addressData)
+          .eq('id', user?.id);
+
+        if (error) throw error;
+        
+        toast({
+          title: "Success",
+          description: "Profile address updated successfully!",
+        });
+        
+        // Reload the address
+        loadUserAddress();
+      } else {
+        // For delivery address, just update the display
+        const addressParts = [
+          addressData.address_line1,
+          addressData.address_line2,
+          addressData.city,
+          addressData.state,
+          addressData.pincode,
+          addressData.country
+        ].filter(Boolean);
+        
+        setUserAddress(addressParts.join(', '));
+        
+        toast({
+          title: "Success",
+          description: "Delivery address set successfully!",
+        });
+      }
+      
+      setIsEditingAddress(false);
+    } catch (error) {
+      console.error('Error saving address:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save address. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -170,15 +229,27 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, total }:
                       <MapPin className="h-4 w-4" />
                       Delivery Address
                     </h4>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => setIsEditingAddress(true)}
-                      className="flex items-center gap-1"
-                    >
-                      <Edit className="h-3 w-3" />
-                      {userAddress === "No address saved" ? "Add" : "Change"}
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handleAddressChange("profile")}
+                        className="flex items-center gap-1"
+                      >
+                        <Edit className="h-3 w-3" />
+                        {userAddress === "No address saved" ? "Add" : "Change"}
+                      </Button>
+                      {userAddress !== "No address saved" && (
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleAddressChange("delivery")}
+                          className="text-xs"
+                        >
+                          Different Address
+                        </Button>
+                      )}
+                    </div>
                   </div>
                   <div className="p-3 bg-muted rounded-lg">
                     <p className="text-sm text-muted-foreground">
@@ -213,37 +284,19 @@ const Cart = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, total }:
             </div>
           )}
 
-          {/* Address Edit Modal Trigger */}
+          {/* Address Edit Form */}
           {isEditingAddress && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-              <div className="bg-background rounded-lg p-6 max-w-md w-full mx-4">
-                <h3 className="text-lg font-semibold mb-4">Update Address</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  To update your delivery address, please go to your profile settings.
-                </p>
-                <div className="flex gap-3">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setIsEditingAddress(false)}
-                    className="flex-1"
-                  >
-                    Cancel
-                  </Button>
-                  <Button 
-                    variant="cart"
-                    onClick={() => {
-                      setIsEditingAddress(false);
-                      // This would open the profile modal in a real implementation
-                      // For now, we'll just refresh the address
-                      loadUserAddress();
-                    }}
-                    className="flex-1"
-                  >
-                    Go to Profile
-                  </Button>
-                </div>
-              </div>
-            </div>
+            <AddressForm
+              initialAddress={addressType === "profile" ? currentAddress : undefined}
+              onSave={handleAddressSave}
+              onCancel={() => setIsEditingAddress(false)}
+              title={
+                addressType === "profile" 
+                  ? "Update Profile Address" 
+                  : "Add Delivery Address"
+              }
+              isDeliveryAddress={addressType === "delivery"}
+            />
           )}
         </div>
       </div>

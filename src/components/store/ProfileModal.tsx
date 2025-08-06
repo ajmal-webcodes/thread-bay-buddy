@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +18,9 @@ interface ProfileModalProps {
 
 const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
   const { user } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string>("");
   const [profileData, setProfileData] = useState({
     display_name: "",
     email: "",
@@ -94,6 +97,7 @@ const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
           state: data.state || "",
           country: data.country || "India"
         });
+        setAvatarPreview(data.avatar_url || "");
       }
     } catch (error) {
       console.error('Error loading profile:', error);
@@ -106,16 +110,42 @@ const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
     setProfileData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAvatarFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadAvatar = async (file: File): Promise<string> => {
+    // For now, we'll create a blob URL as a placeholder
+    // In a real app, you'd upload to Supabase Storage
+    return URL.createObjectURL(file);
+  };
+
   const handleSaveProfile = async () => {
     if (!user) return;
     
     setLoading(true);
     try {
+      let updatedData = { ...profileData };
+      
+      // Upload avatar if selected
+      if (avatarFile) {
+        const avatarUrl = await uploadAvatar(avatarFile);
+        updatedData.avatar_url = avatarUrl;
+      }
+
       const { error } = await supabase
         .from('profiles')
         .upsert({
           id: user.id,
-          ...profileData,
+          ...updatedData,
           updated_at: new Date().toISOString()
         });
 
@@ -126,6 +156,7 @@ const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
       }
 
       toast.success('Profile saved successfully');
+      setAvatarFile(null);
       onClose();
     } catch (error) {
       console.error('Error saving profile:', error);
@@ -173,7 +204,7 @@ const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
                 <div className="flex items-center space-x-4">
                   <div className="relative">
                     <Avatar className="h-20 w-20">
-                      <AvatarImage src={profileData.avatar_url || "/placeholder-avatar.jpg"} />
+                      <AvatarImage src={avatarPreview || profileData.avatar_url || "/placeholder-avatar.jpg"} />
                       <AvatarFallback className="text-xl">
                         {profileData.display_name ? profileData.display_name.split(' ').map(n => n[0]).join('').toUpperCase() : 'U'}
                       </AvatarFallback>
@@ -182,6 +213,7 @@ const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
                       size="icon"
                       variant="secondary"
                       className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full"
+                      onClick={() => fileInputRef.current?.click()}
                     >
                       <Camera className="h-3 w-3" />
                     </Button>
@@ -194,7 +226,28 @@ const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
                       <Calendar className="h-4 w-4" />
                       Member since {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'Recently'}
                     </p>
+                    {avatarPreview && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => {
+                          setAvatarFile(null);
+                          setAvatarPreview("");
+                        }}
+                        className="text-xs mt-1"
+                      >
+                        Remove Photo
+                      </Button>
+                    )}
                   </div>
+                  
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
                 </div>
 
                 <Separator />
