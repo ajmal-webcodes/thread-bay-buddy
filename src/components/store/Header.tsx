@@ -43,9 +43,6 @@ const Header = ({ cartItemsCount, onCartClick, onProfileClick }: HeaderProps) =>
             <a href="/beauty" className="text-sm font-medium hover:text-accent transition-colors">
               Beauty
             </a>
-            <a href="/wishlist" className="text-sm font-medium hover:text-accent transition-colors">
-              Wishlist
-            </a>
           </nav>
 
           {/* Actions */}
@@ -56,7 +53,7 @@ const Header = ({ cartItemsCount, onCartClick, onProfileClick }: HeaderProps) =>
             <Button variant="ghost" size="icon" onClick={onProfileClick}>
               <User className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" onClick={() => window.location.href = '/wishlist'}>
               <Heart className="h-5 w-5" />
             </Button>
             <Button variant="ghost" size="icon" onClick={onCartClick} className="relative">
@@ -88,9 +85,6 @@ const Header = ({ cartItemsCount, onCartClick, onProfileClick }: HeaderProps) =>
               </a>
               <a href="/beauty" className="text-sm font-medium hover:text-accent transition-colors">
                 Beauty
-              </a>
-              <a href="/wishlist" className="text-sm font-medium hover:text-accent transition-colors">
-                Wishlist
               </a>
             </nav>
           </div>
