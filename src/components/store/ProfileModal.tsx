@@ -10,6 +10,7 @@ import { X, Camera, User, MapPin, Phone, Mail, Calendar } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ interface ProfileModalProps {
 
 const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string>("");
@@ -166,6 +168,18 @@ const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast.success('Signed out');
+      onClose();
+      navigate('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
+      toast.error('Failed to sign out');
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -185,9 +199,14 @@ const ProfileModal = ({ isOpen, onClose }: ProfileModalProps) => {
               <User className="h-6 w-6" />
               My Profile
             </h2>
-            <Button variant="ghost" size="icon" onClick={onClose}>
-              <X className="h-5 w-5" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="destructive" size="sm" onClick={handleLogout}>
+                Log out
+              </Button>
+              <Button variant="ghost" size="icon" onClick={onClose}>
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
           
           {/* Content */}

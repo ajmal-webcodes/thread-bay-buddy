@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, Search, Heart, Menu, User } from "lucide-react";
+import { ShoppingBag, Search, Heart, Menu, User, ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -14,6 +14,7 @@ interface HeaderProps {
 const Header = ({ cartItemsCount, onCartClick, onProfileClick }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
 
   const handleWishlistClick = () => {
@@ -38,23 +39,32 @@ const Header = ({ cartItemsCount, onCartClick, onProfileClick }: HeaderProps) =>
             >
               <Menu className="h-5 w-5" />
             </Button>
+            {location.pathname !== '/' && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate('/')}
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            )}
             <h1 className="text-2xl font-bold tracking-tight">VELVERRA</h1>
           </div>
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="/women" className="text-sm font-medium hover:text-accent transition-colors">
+            <Link to="/women" className="text-sm font-medium hover:text-accent transition-colors">
               Women
-            </a>
-            <a href="/men" className="text-sm font-medium hover:text-accent transition-colors">
+            </Link>
+            <Link to="/men" className="text-sm font-medium hover:text-accent transition-colors">
               Men
-            </a>
-            <a href="/accessories" className="text-sm font-medium hover:text-accent transition-colors">
+            </Link>
+            <Link to="/accessories" className="text-sm font-medium hover:text-accent transition-colors">
               Accessories
-            </a>
-            <a href="/beauty" className="text-sm font-medium hover:text-accent transition-colors">
+            </Link>
+            <Link to="/beauty" className="text-sm font-medium hover:text-accent transition-colors">
               Beauty
-            </a>
+            </Link>
           </nav>
 
           {/* Actions */}
@@ -65,9 +75,11 @@ const Header = ({ cartItemsCount, onCartClick, onProfileClick }: HeaderProps) =>
             <Button variant="ghost" size="icon" onClick={onProfileClick}>
               <User className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={handleWishlistClick}>
-              <Heart className="h-5 w-5" />
-            </Button>
+            {user && (
+              <Button variant="ghost" size="icon" onClick={handleWishlistClick}>
+                <Heart className="h-5 w-5" />
+              </Button>
+            )}
             <Button variant="ghost" size="icon" onClick={onCartClick} className="relative">
               <ShoppingBag className="h-5 w-5" />
               {cartItemsCount > 0 && (
@@ -86,18 +98,18 @@ const Header = ({ cartItemsCount, onCartClick, onProfileClick }: HeaderProps) =>
         {isMenuOpen && (
           <div className="md:hidden pb-4 border-t border-border mt-4 pt-4">
             <nav className="flex flex-col space-y-3">
-              <a href="/women" className="text-sm font-medium hover:text-accent transition-colors">
+              <Link to="/women" className="text-sm font-medium hover:text-accent transition-colors">
                 Women
-              </a>
-              <a href="/men" className="text-sm font-medium hover:text-accent transition-colors">
+              </Link>
+              <Link to="/men" className="text-sm font-medium hover:text-accent transition-colors">
                 Men
-              </a>
-              <a href="/accessories" className="text-sm font-medium hover:text-accent transition-colors">
+              </Link>
+              <Link to="/accessories" className="text-sm font-medium hover:text-accent transition-colors">
                 Accessories
-              </a>
-              <a href="/beauty" className="text-sm font-medium hover:text-accent transition-colors">
+              </Link>
+              <Link to="/beauty" className="text-sm font-medium hover:text-accent transition-colors">
                 Beauty
-              </a>
+              </Link>
             </nav>
           </div>
         )}

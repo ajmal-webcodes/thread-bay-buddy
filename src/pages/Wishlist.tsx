@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@supabase/supabase-js";
 import { Heart } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Wishlist = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -226,24 +227,42 @@ const Wishlist = () => {
               
               if (isCosmetic) {
                 return (
-                  <CosmeticCard
-                    key={product.id}
+                  <div key={product.id} className="space-y-3">
+                    <CosmeticCard
+                      product={product}
+                      onAddToCart={() => setSelectedProduct(product)}
+                      onToggleWishlist={() => toggleWishlist(product.id)}
+                      isInWishlist={true}
+                    />
+                    <div className="flex gap-2">
+                      <Button variant="cart" size="sm" onClick={() => setSelectedProduct(product)}>
+                        Buy Now
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => toggleWishlist(product.id)}>
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+                );
+              }
+              
+              return (
+                <div key={product.id} className="space-y-3">
+                  <ProductCard
                     product={product}
                     onAddToCart={() => setSelectedProduct(product)}
                     onToggleWishlist={() => toggleWishlist(product.id)}
                     isInWishlist={true}
                   />
-                );
-              }
-              
-              return (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onAddToCart={() => setSelectedProduct(product)}
-                  onToggleWishlist={() => toggleWishlist(product.id)}
-                  isInWishlist={true}
-                />
+                  <div className="flex gap-2">
+                    <Button variant="cart" size="sm" onClick={() => setSelectedProduct(product)}>
+                      Buy Now
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => toggleWishlist(product.id)}>
+                      Remove
+                    </Button>
+                  </div>
+                </div>
               );
             })}
           </div>
