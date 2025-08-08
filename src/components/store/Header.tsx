@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag, Search, Heart, Menu, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/useAuth";
 
 interface HeaderProps {
   cartItemsCount: number;
@@ -11,6 +13,16 @@ interface HeaderProps {
 
 const Header = ({ cartItemsCount, onCartClick, onProfileClick }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleWishlistClick = () => {
+    if (user) {
+      navigate('/wishlist');
+    } else {
+      navigate('/auth');
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -53,7 +65,7 @@ const Header = ({ cartItemsCount, onCartClick, onProfileClick }: HeaderProps) =>
             <Button variant="ghost" size="icon" onClick={onProfileClick}>
               <User className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => window.location.href = '/wishlist'}>
+            <Button variant="ghost" size="icon" onClick={handleWishlistClick}>
               <Heart className="h-5 w-5" />
             </Button>
             <Button variant="ghost" size="icon" onClick={onCartClick} className="relative">
