@@ -18,16 +18,14 @@ export const useIsAdmin = () => {
         return;
       }
       setLoading(true);
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id);
+      const { data: hasAdmin, error } = await supabase
+        .rpc('has_role', { _user_id: user.id, _role: 'admin' });
       if (active) {
         if (error) {
-          console.error("Failed to fetch user roles", error);
+          console.error("Failed to check admin role", error);
           setIsAdmin(false);
         } else {
-          setIsAdmin(!!data?.some((r: any) => r.role === "admin"));
+          setIsAdmin(!!hasAdmin);
         }
         setLoading(false);
       }
