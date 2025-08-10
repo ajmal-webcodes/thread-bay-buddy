@@ -23,23 +23,33 @@ const Auth = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if user is already logged in
-    const checkUser = async () => {
+    const checkAdminAndNavigate = async (uid: string) => {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', uid);
+      const isAdmin = !!data?.some((r: any) => r.role === 'admin');
+      navigate(isAdmin ? '/admin' : '/');
+    };
+
+    // Initial session
+    const init = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         setUser(session.user);
-        navigate("/");
+        await checkAdminAndNavigate(session.user.id);
       }
     };
-
-    checkUser();
+    init();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (session?.user) {
           setUser(session.user);
-          navigate("/");
+          setTimeout(() => {
+            checkAdminAndNavigate(session.user!.id);
+          }, 0);
         } else {
           setUser(null);
         }

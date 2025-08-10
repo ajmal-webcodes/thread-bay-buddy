@@ -11,6 +11,7 @@ import Accessories from "./pages/Accessories";
 import Beauty from "./pages/Beauty";
 import Auth from "./pages/Auth";
 import Wishlist from "./pages/Wishlist";
+import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/beauty" element={<Beauty />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/admin" element={<Admin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

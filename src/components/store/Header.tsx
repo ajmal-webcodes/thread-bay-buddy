@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingBag, Search, Heart, Menu, User, ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 interface HeaderProps {
   cartItemsCount: number;
@@ -16,6 +17,7 @@ const Header = ({ cartItemsCount, onCartClick, onProfileClick }: HeaderProps) =>
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const { isAdmin } = useIsAdmin();
 
   const handleWishlistClick = () => {
     if (user) {
@@ -65,6 +67,11 @@ const Header = ({ cartItemsCount, onCartClick, onProfileClick }: HeaderProps) =>
             <Link to="/beauty" className="text-sm font-medium hover:text-accent transition-colors">
               Beauty
             </Link>
+            {isAdmin && (
+              <Link to="/admin" className="text-sm font-medium hover:text-accent transition-colors">
+                Admin
+              </Link>
+            )}
           </nav>
 
           {/* Actions */}
@@ -110,6 +117,11 @@ const Header = ({ cartItemsCount, onCartClick, onProfileClick }: HeaderProps) =>
               <Link to="/beauty" className="text-sm font-medium hover:text-accent transition-colors">
                 Beauty
               </Link>
+              {isAdmin && (
+                <Link to="/admin" className="text-sm font-medium hover:text-accent transition-colors">
+                  Admin
+                </Link>
+              )}
             </nav>
           </div>
         )}
